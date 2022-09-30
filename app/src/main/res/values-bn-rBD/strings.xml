@@ -3,4 +3,9 @@
     <string name="app_name">Fariha\'s Android Labs</string>
     <string name="hello_message">Ohay Prithibi!</string>
     <string name="button_message">Ami Ekti Botam</string>
+    <string name="checkbox_message">Apni ki kofi khan?</string>
+    <string name="hinttext">Ekhane kichu likhun</string>
+    <string name="editmessage">Ami ekti notun likha</string>
+    <string name="switch_message">Apni ki kofi khan?</string>
+    <string name="radio_message">Apni ki kofi khan?</string>
 </resources>

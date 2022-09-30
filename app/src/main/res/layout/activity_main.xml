@@ -27,5 +27,41 @@
         android:hint="@string/hinttext"
         />
 
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/checkbox_message"
+        android:id="@+id/checkbox_button"
+        />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/switch_message"
+        android:id="@+id/switch_button"
+        />
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/radio_message"
+        android:id="@+id/radio_button"
+        />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo_algonquin"
+        android:id="@+id/myimage"
+        />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo_algonquin"
+        android:id="@+id/myimagebutton"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        />
 
 </LinearLayout>
