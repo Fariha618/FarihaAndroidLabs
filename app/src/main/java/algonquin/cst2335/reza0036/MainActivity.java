@@ -2,7 +2,9 @@ package algonquin.cst2335.reza0036;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SharedPreferences prefs = getSharedPreferences("MyData", Context.MODE_PRIVATE);
 
         Intent nextPage = new Intent( MainActivity.this, SecondActivity.class);
 
@@ -22,8 +25,14 @@ public class MainActivity extends AppCompatActivity {
 
         Button loginButton = findViewById(R.id.loginButton);
         EditText EditText = findViewById(R.id.editTextTextPersonName);
+        String emailAddress = prefs.getString("LoginName", "");
+        EditText.setText(emailAddress);
+
         loginButton.setOnClickListener( clk-> {
             nextPage.putExtra( "EmailAddress", EditText.getText().toString() );
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("LoginName", EditText.getText().toString());
+            editor.apply();
             startActivity(nextPage);
 
         } );
