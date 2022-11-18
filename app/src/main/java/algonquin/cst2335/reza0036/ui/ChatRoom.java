@@ -37,6 +37,7 @@ public class ChatRoom extends AppCompatActivity {
     ArrayList<ChatMessage> messages;
     ChatRoomViewModel chatModel;
     ChatMessageDao mDAO;
+    ChatMessage chatRoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,41 @@ public class ChatRoom extends AppCompatActivity {
                 runOnUiThread( () ->  binding.recycleView.setAdapter( myAdapter )); //You can then load the RecyclerView
             });
         }
+
+        binding.sendButton.setOnClickListener(click -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd-MMM-yyy hh-mm-ss a");
+            String currentDateandTIme = sdf.format(new Date());
+
+            chatRoom = new ChatMessage(binding.textInput.getText().toString(), currentDateandTIme, true);
+            messages.add(chatRoom);
+            myAdapter.notifyItemInserted(messages.size()-1);
+            binding.textInput.setText("");
+
+            Executor thread = Executors.newSingleThreadExecutor();
+            thread.execute(() ->
+            {
+                long last = mDAO.insertMessage(chatRoom);
+                chatRoom.id = (int) last;
+            });
+
+        });
+
+        binding.receiveButton.setOnClickListener(click -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd-MMM-yyy hh-mm-ss a");
+            String currentDateandTIme = sdf.format(new Date());
+            chatRoom = new ChatMessage(binding.textInput.getText().toString(), currentDateandTIme, false);
+            messages.add(chatRoom);
+            myAdapter.notifyItemInserted(messages.size()-1);
+            binding.textInput.setText("");
+
+            Executor thread = Executors.newSingleThreadExecutor();
+            thread.execute(() ->
+            {
+                long last = mDAO.insertMessage(chatRoom);
+                chatRoom.id = (int) last;
+            });
+        });
+        binding.recycleView.setLayoutManager(new LinearLayoutManager(this));
 
         binding.recycleView.setAdapter(myAdapter = new RecyclerView.Adapter<MyRowHolder>() {
             @NonNull
@@ -104,22 +140,7 @@ public class ChatRoom extends AppCompatActivity {
             }
         });
 
-        binding.sendButton.setOnClickListener(click -> {
-            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd-MMM-yyy hh-mm-ss a");
-            String currentDateandTIme = sdf.format(new Date());
-            messages.add(new ChatMessage(binding.textInput.getText().toString(), currentDateandTIme, true));
-            myAdapter.notifyItemInserted(messages.size()-1);
-            binding.textInput.setText("");
-        });
 
-        binding.receiveButton.setOnClickListener(click -> {
-            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd-MMM-yyy hh-mm-ss a");
-            String currentDateandTIme = sdf.format(new Date());
-            messages.add(new ChatMessage(binding.textInput.getText().toString(), currentDateandTIme, false));
-            myAdapter.notifyItemInserted(messages.size()-1);
-            binding.textInput.setText("");
-        });
-        binding.recycleView.setLayoutManager(new LinearLayoutManager(this));
 
 
     }
@@ -132,6 +153,7 @@ public class ChatRoom extends AppCompatActivity {
 
             itemView.setOnClickListener(clk ->{
                 int position = getAbsoluteAdapterPosition();
+                ChatMessage removedMessage = messages.get(position);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder( ChatRoom.this );
 
@@ -142,17 +164,27 @@ public class ChatRoom extends AppCompatActivity {
 
                         .setPositiveButton("Yes", (dialog, cl) -> {
 
-                            ChatMessage removedMessage = messages.get(position);
+
                             messages.remove(position);
                             myAdapter.notifyItemRemoved(position);
 
 
                             Snackbar.make(messageText, "You Deleted message #"+ position, Snackbar.LENGTH_LONG)
                                     .setAction("Undo", click -> {
+                                        Executor thread = Executors.newSingleThreadExecutor();
+                                        thread.execute(() ->
+                                        {
+                                            mDAO.insertMessage(removedMessage);
+                                        });
                                         messages.add(position, removedMessage);
                                         myAdapter.notifyItemInserted(position);
                                     })
                                     .show();
+                            Executor thread = Executors.newSingleThreadExecutor();
+                            thread.execute(() ->
+                            {
+                               mDAO.deleteMessage(removedMessage);
+                            });
                         })
                         .create()
                         .show();
