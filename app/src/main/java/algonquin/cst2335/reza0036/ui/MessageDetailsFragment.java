@@ -26,6 +26,12 @@ public class MessageDetailsFragment extends Fragment {
 
         binding.messageView.setText(selected.getMessage());
         binding.timeView.setText(selected.getTimeSent());
+        if(selected.isSentButton()==true){
+            binding.sendMessageView.setText("Message is sent from Send Button");
+        }
+        else{
+            binding.sendMessageView.setText("Message is received from Receive Button");
+        }
         binding.databaseIdView.setText("Id = "+ selected.id);
 
         return binding.getRoot();
