@@ -3,6 +3,8 @@ package algonquin.cst2335.reza0036.ui;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -140,10 +142,19 @@ public class ChatRoom extends AppCompatActivity {
             }
         });
 
+        chatModel.selectedMessage.observe(this, (newMessageValue) -> {
 
+            MessageDetailsFragment chatFragment = new MessageDetailsFragment(newMessageValue);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .addToBackStack("")
+                    .replace(R.id.fragmentLocation, chatFragment)
+                    .commit();
 
+        });
 
     }
+
     class MyRowHolder extends RecyclerView.ViewHolder {
         TextView messageText;
         TextView timeText;
@@ -152,7 +163,7 @@ public class ChatRoom extends AppCompatActivity {
             super(itemView);
 
             itemView.setOnClickListener(clk ->{
-                int position = getAbsoluteAdapterPosition();
+               /* int position = getAbsoluteAdapterPosition();
                 ChatMessage removedMessage = messages.get(position);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder( ChatRoom.this );
@@ -188,7 +199,11 @@ public class ChatRoom extends AppCompatActivity {
                         })
                         .create()
                         .show();
+*/
+                int position = getAbsoluteAdapterPosition();
+                ChatMessage selected = messages.get(position);
 
+                chatModel.selectedMessage.postValue(selected);
             });
 
             messageText = itemView.findViewById(R.id.messageText);
