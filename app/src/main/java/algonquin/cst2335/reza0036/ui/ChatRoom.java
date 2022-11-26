@@ -11,9 +11,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -40,6 +43,70 @@ public class ChatRoom extends AppCompatActivity {
     ChatRoomViewModel chatModel;
     ChatMessageDao mDAO;
     ChatMessage chatRoom;
+    int position;
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.my_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        TextView messageText;
+
+        messageText = binding.recycleView.findViewById(R.id.messageText);
+
+        switch( item.getItemId() )
+        {
+            case R.id.item_1:
+
+                ChatMessage removedMessage = messages.get(position);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder( ChatRoom.this );
+
+                builder.setMessage("Do you want to delete the message: " +messageText.getText())
+                        .setTitle("Question: ")
+
+                        .setNegativeButton("No", (dialog, cl) -> { })
+
+                        .setPositiveButton("Yes", (dialog, cl) -> {
+
+
+                            messages.remove(position);
+                            myAdapter.notifyItemRemoved(position);
+
+
+                            Snackbar.make(messageText, "You Deleted message #"+ position, Snackbar.LENGTH_LONG)
+                                    .setAction("Undo", click -> {
+                                        Executor thread = Executors.newSingleThreadExecutor();
+                                        thread.execute(() ->
+                                        {
+                                            mDAO.insertMessage(removedMessage);
+                                        });
+                                        messages.add(position, removedMessage);
+                                        myAdapter.notifyItemInserted(position);
+                                    })
+                                    .show();
+                            Executor thread = Executors.newSingleThreadExecutor();
+                            thread.execute(() ->
+                            {
+                                mDAO.deleteMessage(removedMessage);
+                            });
+                        })
+                        .create()
+                        .show();
+                break;
+
+            case R.id.about:
+                Toast.makeText(this, "Version 1.0, created by Fariha Reza", Toast.LENGTH_LONG).show();
+                break;
+        }
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +114,7 @@ public class ChatRoom extends AppCompatActivity {
 
         binding = ActivityChatRoomBinding.inflate((getLayoutInflater()));
         setContentView(binding.getRoot());
+        setSupportActionBar(binding.toolbar);
 
         MessageDatabase db = Room.databaseBuilder(getApplicationContext(), MessageDatabase.class, "database-name").build();
         mDAO = db.cmDAO();

@@ -11,5 +11,9 @@
         <item name="android:statusBarColor">@color/my_statusbar</item>
         <!-- Text Color For Hello World. -->
         <item name="android:textColor">@color/my_text</item>
+
+        <!-- Tells Android not to use ActionBar in order to use Toolbar -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 </resources>
